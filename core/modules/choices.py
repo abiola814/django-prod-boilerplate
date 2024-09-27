@@ -87,3 +87,8 @@ INVESTMENT_TYPE = (
     ("prestige", "Prestige"),
     ("advance", "Advance"),
 )
+
+ROLE_CHOICES = (
+    ("admin", "Admin"), ("upAdmin", "UP Admin"), ("instUser1", "Institution User 1"),
+    ("instUser2", "Institution User 2"),
+)

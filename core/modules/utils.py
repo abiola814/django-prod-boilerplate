@@ -15,6 +15,10 @@ from dateutil.relativedelta import relativedelta
 from home.models import SiteSetting
 from django.shortcuts import render
 from django.http import HttpResponse
+from threading import Thread
+from home.models import Audit
+import requests
+import json
 
 
 from Crypto.Cipher import AES
@@ -125,6 +129,45 @@ def generate_random_otp():
 def get_previous_date(date, delta):
     previous_date = date - relativedelta(days=delta)
     return previous_date
+
+def send_email(content, email, subject):
+    d_site = get_site_details()
+    email_url = settings.EMAIL_URL
+
+    payload = json.dumps({"Message": content, "address": email, "Subject": subject})
+    log_request(f"record to be sent to email ", {payload})
+    response = requests.request(
+        "POST", email_url, headers={"Content-Type": "application/json"}, data=payload
+    )
+    log_request(f"Sending email to: {email}\nResponse: {response.text}")
+    return response.text
+
+
+def create_audit(**kwargs):
+    audit = Audit(**kwargs)
+    audit.save()
+
+
+def perform_audit(headers, action, user, method="POST"):
+    data_source = headers.get("ipAddress")
+    browser = headers.get("browser")
+    system = headers.get("os")
+    device = headers.get("device")
+
+    source = encrypt_text(data_source)
+
+    # Create Audit
+    create_audit(
+        action=action,
+        user=user,
+        source=source,
+        browser=browser,
+        system=system,
+        method=method,
+        device=device,
+    )
+
+    return True
 
 
 def get_next_date(date, delta):

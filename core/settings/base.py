@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     # Installed Apps
+    "home.apps.HomeConfig",
 
     # Dependencies
     'drf_spectacular',
